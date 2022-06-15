@@ -34,7 +34,8 @@ const AvailableMeals = () => {
   const mealsList = DUMMY_MEALS.map((meal) => {
     return (
       <MealItem
-        key={meal.id}
+        id={meal.id}
+        key={meal.id} //key prop is not accessible in component
         name={meal.name}
         description={meal.description}
         price={meal.price}
