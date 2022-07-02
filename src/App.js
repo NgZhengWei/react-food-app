@@ -19,9 +19,7 @@ function App() {
     <CartProvider>
       {cartIsShown && <Cart onHideCart={hideCartHandler} />}
       <Header onShowCart={showCartHandler} />
-      <main>
-        <Meals />
-      </main>
+      <main>{<Meals />}</main>
     </CartProvider>
   );
 }

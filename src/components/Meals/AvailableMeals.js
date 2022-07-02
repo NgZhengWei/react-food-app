@@ -1,53 +1,58 @@
+import { useEffect, useState } from 'react';
 import Card from '../UI/Card';
 import MealItem from './MealItem/MealItem';
+import useHttp from '../../hooks/use-http';
 
 import classes from './AvailableMeals.module.css';
 
-const DUMMY_MEALS = [
-  {
-    id: 'm1',
-    name: 'Sushi',
-    description: 'Finest fish and veggies',
-    price: 22.99,
-  },
-  {
-    id: 'm2',
-    name: 'Schnitzel',
-    description: 'A german specialty!',
-    price: 16.5,
-  },
-  {
-    id: 'm3',
-    name: 'Barbecue Burger',
-    description: 'American, raw, meaty',
-    price: 12.99,
-  },
-  {
-    id: 'm4',
-    name: 'Green Bowl',
-    description: 'Healthy...and green...',
-    price: 18.99,
-  },
-];
-
 const AvailableMeals = () => {
-  const mealsList = DUMMY_MEALS.map((meal) => {
-    return (
-      <MealItem
-        id={meal.id}
-        key={meal.id} //key prop is not accessible in component
-        name={meal.name}
-        description={meal.description}
-        price={meal.price}
-      />
+  const [mealsList, setMealsList] = useState([]);
+
+  const {
+    isLoading: mealsIsLoading,
+    error: mealsError,
+    sendRequest: getMealsData,
+  } = useHttp();
+
+  useEffect(() => {
+    getMealsData(
+      {
+        url: 'https://react-learning-4d125-default-rtdb.asia-southeast1.firebasedatabase.app/meals.json',
+      },
+      (data) => {
+        const meals = [];
+        for (const key in data) {
+          meals.push(
+            <MealItem
+              id={key}
+              key={key} //key prop is not accessible in component
+              name={data[key].name}
+              description={data[key].description}
+              price={data[key].price}
+            />
+          );
+        }
+
+        setMealsList(meals);
+      }
     );
-  });
+  }, [getMealsData]);
+
+  function displayMealsList() {
+    if (mealsIsLoading) {
+      return <p>Loading...</p>;
+    } else if (mealsError) {
+      return <p className={classes['error-text']}>{mealsError}</p>;
+    } else if (mealsList.length === 0) {
+      return <p>No meals found</p>;
+    } else {
+      return <ul>{mealsList}</ul>;
+    }
+  }
 
   return (
     <section className={classes.meals}>
-      <Card>
-        <ul>{mealsList}</ul>
-      </Card>
+      <Card>{displayMealsList()}</Card>
     </section>
   );
 };
